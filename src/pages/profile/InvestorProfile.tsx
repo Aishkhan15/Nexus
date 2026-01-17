@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { MessageCircle, Building2, MapPin, UserCircle, BarChart3, Briefcase } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
 import { Button } from '../../components/ui/Button';
@@ -11,25 +11,39 @@ import { Investor } from '../../types';
 
 export const InvestorProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user: currentUser } = useAuth();
-  
+  const { user: currentUser, isLoading } = useAuth();
+
+  // Show loading spinner while auth state is loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  // Ensure user is logged in
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
   // Fetch investor data
   const investor = findUserById(id || '') as Investor | null;
-  
+
   if (!investor || investor.role !== 'investor') {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900">Investor not found</h2>
         <p className="text-gray-600 mt-2">The investor profile you're looking for doesn't exist or has been removed.</p>
-        <Link to="/dashboard/entrepreneur">
+        <Link to={`/dashboard/${currentUser.role}`}>
           <Button variant="outline" className="mt-4">Back to Dashboard</Button>
         </Link>
       </div>
     );
   }
-  
-  const isCurrentUser = currentUser?.id === investor.id;
-  
+
+  const isCurrentUser = currentUser.id === investor.id;
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Profile header */}
@@ -43,14 +57,14 @@ export const InvestorProfile: React.FC = () => {
               status={investor.isOnline ? 'online' : 'offline'}
               className="mx-auto sm:mx-0"
             />
-            
+
             <div className="mt-4 sm:mt-0 text-center sm:text-left">
               <h1 className="text-2xl font-bold text-gray-900">{investor.name}</h1>
               <p className="text-gray-600 flex items-center justify-center sm:justify-start mt-1">
                 <Building2 size={16} className="mr-1" />
                 Investor • {investor.totalInvestments} investments
               </p>
-              
+
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start mt-3">
                 <Badge variant="primary">
                   <MapPin size={14} className="mr-1" />
@@ -62,30 +76,23 @@ export const InvestorProfile: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-2 justify-center sm:justify-end">
             {!isCurrentUser && (
               <Link to={`/chat/${investor.id}`}>
-                <Button
-                  leftIcon={<MessageCircle size={18} />}
-                >
-                  Message
-                </Button>
+                <Button leftIcon={<MessageCircle size={18} />}>Message</Button>
               </Link>
             )}
-            
+
             {isCurrentUser && (
-              <Button
-                variant="outline"
-                leftIcon={<UserCircle size={18} />}
-              >
+              <Button variant="outline" leftIcon={<UserCircle size={18} />}>
                 Edit Profile
               </Button>
             )}
           </div>
         </CardBody>
       </Card>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content - left side */}
         <div className="lg:col-span-2 space-y-6">
@@ -98,7 +105,7 @@ export const InvestorProfile: React.FC = () => {
               <p className="text-gray-700">{investor.bio}</p>
             </CardBody>
           </Card>
-          
+
           {/* Investment Interests */}
           <Card>
             <CardHeader>
@@ -114,7 +121,7 @@ export const InvestorProfile: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-md font-medium text-gray-900">Investment Stages</h3>
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -123,7 +130,7 @@ export const InvestorProfile: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-md font-medium text-gray-900">Investment Criteria</h3>
                   <ul className="mt-2 space-y-2 text-gray-700">
@@ -148,7 +155,7 @@ export const InvestorProfile: React.FC = () => {
               </div>
             </CardBody>
           </Card>
-          
+
           {/* Portfolio Companies */}
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -172,7 +179,7 @@ export const InvestorProfile: React.FC = () => {
             </CardBody>
           </Card>
         </div>
-        
+
         {/* Sidebar - right side */}
         <div className="space-y-6">
           {/* Investment Details */}
@@ -188,17 +195,15 @@ export const InvestorProfile: React.FC = () => {
                     {investor.minimumInvestment} - {investor.maximumInvestment}
                   </p>
                 </div>
-                
                 <div>
                   <span className="text-sm text-gray-500">Total Investments</span>
                   <p className="text-md font-medium text-gray-900">{investor.totalInvestments} companies</p>
                 </div>
-                
                 <div>
                   <span className="text-sm text-gray-500">Typical Investment Timeline</span>
                   <p className="text-md font-medium text-gray-900">3-5 years</p>
                 </div>
-                
+
                 <div className="pt-3 border-t border-gray-100">
                   <span className="text-sm text-gray-500">Investment Focus</span>
                   <div className="mt-2 space-y-2">
@@ -225,7 +230,7 @@ export const InvestorProfile: React.FC = () => {
               </div>
             </CardBody>
           </Card>
-          
+
           {/* Stats */}
           <Card>
             <CardHeader>
@@ -242,7 +247,7 @@ export const InvestorProfile: React.FC = () => {
                     <BarChart3 size={24} className="text-primary-600" />
                   </div>
                 </div>
-                
+
                 <div className="p-3 border border-gray-200 rounded-md bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div>
@@ -252,7 +257,7 @@ export const InvestorProfile: React.FC = () => {
                     <BarChart3 size={24} className="text-primary-600" />
                   </div>
                 </div>
-                
+
                 <div className="p-3 border border-gray-200 rounded-md bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div>

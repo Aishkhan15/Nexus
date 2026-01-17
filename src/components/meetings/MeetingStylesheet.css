@@ -1,0 +1,104 @@
+.meeting-main {
+    flex-grow: 1;
+    /* padding: 3em; */
+}
+
+.fc {
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: inherit;
+}
+
+.fc-scrollgrid {
+    width: 100%;
+}
+
+
+/* Header title */
+.fc-toolbar-title {
+    /* font-size: 0.5 rem; */
+    font-weight: 600;
+    color: #111827;
+    /* gray-900 */
+}
+
+/* Toolbar buttons */
+.fc .fc-button {
+    background-color: #2563eb;
+    /* primary-600 */
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.fc .fc-button:hover {
+    background-color: #1d4ed8;
+    /* primary-700 */
+}
+
+.fc .fc-button:disabled {
+    background-color: #93c5fd;
+    /* primary-300 */
+}
+
+/* Today button */
+.fc .fc-today-button {
+    background-color: #e5e7eb;
+    /* gray-200 */
+    color: #111827;
+}
+
+.fc .fc-today-button:hover {
+    background-color: #d1d5db;
+}
+
+/* Calendar grid */
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #e5e7eb;
+    /* gray-200 */
+}
+
+/* Day header */
+.fc-col-header-cell {
+    background: #f9fafb;
+    /* gray-50 */
+    font-weight: 500;
+    color: #374151;
+    /* gray-700 */
+}
+
+/* Today cell */
+.fc-day-today {
+    background-color: #eff6ff !important;
+    /* primary-50 */
+}
+
+/* Event style */
+.fc-event {
+    background-color: #2563eb;
+    /* primary-600 */
+    border: none;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+}
+
+/* Event hover */
+.fc-event:hover {
+    background-color: #1d4ed8;
+}
+
+/* Time grid events */
+.fc-timegrid-event {
+    border-radius: 6px;
+}
+
+/* More events link */
+.fc-daygrid-more-link {
+    color: #2563eb;
+    font-weight: 500;
+}

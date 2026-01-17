@@ -10,32 +10,43 @@ import { useAuth } from '../../context/AuthContext';
 import { CollaborationRequest } from '../../types';
 import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
 import { investors } from '../../data/users';
+import ConfirmedMeetingsCard from '../../components/meetings/ConfirmedMeetingsCard';
 
 export const EntrepreneurDashboard: React.FC = () => {
   const { user } = useAuth();
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
   const [recommendedInvestors, setRecommendedInvestors] = useState(investors.slice(0, 3));
-  
+
+  const [meetings, setMeetings] = useState<any[]>([]);
+  const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
+  const [confirmedMeetings, setConfirmedMeetings] = useState<any[]>([]);
+
+
   useEffect(() => {
     if (user) {
       // Load collaboration requests
       const requests = getRequestsForEntrepreneur(user.id);
       setCollaborationRequests(requests);
+
+      const data = JSON.parse(
+        localStorage.getItem("confirmedMeetings") || "[]"
+      );
+      setConfirmedMeetings(data);
     }
   }, [user]);
-  
+
   const handleRequestStatusUpdate = (requestId: string, status: 'accepted' | 'rejected') => {
-    setCollaborationRequests(prevRequests => 
-      prevRequests.map(req => 
+    setCollaborationRequests(prevRequests =>
+      prevRequests.map(req =>
         req.id === requestId ? { ...req, status } : req
       )
     );
   };
-  
+
   if (!user) return null;
-  
+
   const pendingRequests = collaborationRequests.filter(req => req.status === 'pending');
-  
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -43,7 +54,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Welcome, {user.name}</h1>
           <p className="text-gray-600">Here's what's happening with your startup today</p>
         </div>
-        
+
         <Link to="/investors">
           <Button
             leftIcon={<PlusCircle size={18} />}
@@ -52,7 +63,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Button>
         </Link>
       </div>
-      
+
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-primary-50 border border-primary-100">
@@ -68,7 +79,7 @@ export const EntrepreneurDashboard: React.FC = () => {
             </div>
           </CardBody>
         </Card>
-        
+
         <Card className="bg-secondary-50 border border-secondary-100">
           <CardBody>
             <div className="flex items-center">
@@ -84,7 +95,7 @@ export const EntrepreneurDashboard: React.FC = () => {
             </div>
           </CardBody>
         </Card>
-        
+
         <Card className="bg-accent-50 border border-accent-100">
           <CardBody>
             <div className="flex items-center">
@@ -98,7 +109,7 @@ export const EntrepreneurDashboard: React.FC = () => {
             </div>
           </CardBody>
         </Card>
-        
+
         <Card className="bg-success-50 border border-success-100">
           <CardBody>
             <div className="flex items-center">
@@ -113,7 +124,9 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
       </div>
-      
+
+
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Collaboration requests */}
         <div className="lg:col-span-2 space-y-4">
@@ -122,7 +135,7 @@ export const EntrepreneurDashboard: React.FC = () => {
               <h2 className="text-lg font-medium text-gray-900">Collaboration Requests</h2>
               <Badge variant="primary">{pendingRequests.length} pending</Badge>
             </CardHeader>
-            
+
             <CardBody>
               {collaborationRequests.length > 0 ? (
                 <div className="space-y-4">
@@ -145,18 +158,109 @@ export const EntrepreneurDashboard: React.FC = () => {
               )}
             </CardBody>
           </Card>
+          <div id="quick-access-card" className="lg:col-span-2 space-y-4">
+            {/* Quick Access Card */}
+            <Card>
+              <CardHeader className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-gray-900">Quick Access</h2>
+                <Badge variant="primary">4 modules</Badge>
+              </CardHeader>
+
+              <CardBody>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Payment Module */}
+                  <Link to="/payments">
+                    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                      <span className="bg-primary-100 p-3 rounded-full mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-primary-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c1.333 0 2-.667 2-2s-.667-2-2-2-2 .667-2 2 .667 2 2 2zM12 14c2.667 0 8 .667 8 2v2H4v-2c0-1.333 5.333-2 8-2z" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">Payments</span>
+                    </div>
+                  </Link>
+
+                  {/* Schedule Meeting Module */}
+                  <Link to="/meeting">
+                    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                      <span className="bg-green-100 p-3 rounded-full mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-green-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">Schedule Meeting</span>
+                    </div>
+                  </Link>
+
+                  {/* Document Chamber Module */}
+                  <Link to="/documents/documentChamber">
+                    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                      <span className="bg-blue-100 p-3 rounded-full mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-blue-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 012 2v6H5v-6a2 2 0 012-2h8zM6 6h12M6 6a2 2 0 00-2 2v0a2 2 0 002 2h12a2 2 0 002-2v0a2 2 0 00-2-2H6z" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">Document Chamber</span>
+                    </div>
+                  </Link>
+
+                  {/* Video Call Module */}
+                  <Link to="/video">
+                    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                      <span className="bg-purple-100 p-3 rounded-full mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-purple-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h11a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">Video Call</span>
+                    </div>
+                  </Link>
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+
         </div>
-        
+
+
+
         {/* Recommended investors */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Recommended Investors</h2>
-              <Link to="/investors" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+              <Link
+                to="/investors"
+                className="text-sm font-medium text-primary-600 hover:text-primary-500"
+              >
                 View all
               </Link>
             </CardHeader>
-            
+
             <CardBody className="space-y-4">
               {recommendedInvestors.map(investor => (
                 <InvestorCard
@@ -167,7 +271,18 @@ export const EntrepreneurDashboard: React.FC = () => {
               ))}
             </CardBody>
           </Card>
+
+          {/* CONFIRMED MEETINGS*/}
+          {confirmedMeetings.length > 0 && (
+            <ConfirmedMeetingsCard meetings={confirmedMeetings} />
+          )}
         </div>
+
+
+
+
+
+
       </div>
     </div>
   );

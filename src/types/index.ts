@@ -78,4 +78,6 @@ export interface AuthContextType {
   updateProfile: (userId: string, updates: Partial<User>) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
+  is2FAVerified: boolean;
+  setIs2FAVerified: React.Dispatch<React.SetStateAction<boolean>>;
 }

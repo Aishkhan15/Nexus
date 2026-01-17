@@ -1,4 +1,5 @@
-import { Entrepreneur, Investor } from '../types';
+import { Entrepreneur, Investor, User } from '../types';
+
 
 export const entrepreneurs: Entrepreneur[] = [
   {
@@ -123,7 +124,9 @@ export const investors: Investor[] = [
 ];
 
 // Combined user data for lookup
-export const users = [...entrepreneurs, ...investors];
+// export let users = [...entrepreneurs, ...investors];
+
+export let users: User[] = [...entrepreneurs, ...investors];
 
 // Helper function to find a user by ID
 export const findUserById = (id: string) => {
